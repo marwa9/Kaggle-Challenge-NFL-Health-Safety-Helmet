@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-@author: Marwa
+@author: Marwa Kechaou
 
 Draw Helmet bounding boxes of a given frame
 """
