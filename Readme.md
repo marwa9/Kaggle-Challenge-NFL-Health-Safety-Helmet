@@ -6,7 +6,8 @@ The main tasks are:
 
 2. Think of / Implement a solution to identify helmet detections based on tracking data
 
-I had two main ideas:
+I took into account the provided recommendation to approach the exercise as a problem-solving task.
+My contemplations revolve around these two ideas:
 
 1. Create visual representations of the graphs for helmet positions using bounding box and tracking data at the same time.
    Map points on both graphs to identify Helmet IDs.
