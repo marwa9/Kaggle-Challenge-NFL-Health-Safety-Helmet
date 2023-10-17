@@ -22,8 +22,9 @@ parser = argparse.ArgumentParser(description='Associate bounding box and trackin
 # Benchmark specific args
 parser.add_argument('--data_path', default="./video_frames/train/57583_000082_Endzone", type=str,help='path of extracted dataframes')
 parser.add_argument('--number_frames', default=472, type=int,help='maximum number of frames extracted from the video game')
-parser.add_argument('--prefix', default="57583_000082_Endzone_", type=str,help='frame_name')
-parser.add_argument('--label', default='H99', type=str,help='Decide if optmizer is Adam or SGD')
+parser.add_argument('--frame_video_name', default="57583_000082", type=str,help='name of the video from which the frame was extracted')
+parser.add_argument('--view', default="Endzone", type=str,help='precise the side if Endzone or Sideline')
+parser.add_argument('--label', default='H50', type=str,help='the player to identify')
 parser.add_argument('--players', default=['V5','V13','V15','V34','V68','V72','V73','V74','V79','V86','V87',
                                           'H22','H27','H30','H36','H50','H56','H59','H90','H96','H97','H99'], type=list,help='list of player IDs')
 
@@ -38,7 +39,7 @@ def plot(x_coordinates,y_coordinates, label,data_type):
     plt.scatter(x_coordinates,y_coordinates, color='blue', marker='o')
     plt.xlabel('X-Axis Label')
     plt.ylabel('Y-Axis Label')
-    plt.title(data_type+ 'plot of player '+label)
+    plt.title(data_type+ ' plot of player '+label)
     plt.show()
 
 
@@ -57,25 +58,22 @@ def curve(x_coordinates,y_coordinates):
 def downsample_vector(vector, target_length):
     if len(vector) <= target_length:
         return vector
-    # Calculate the step size for subsampling
-    step = len(vector) // target_length
-    # Subsample the vector
-    downsampled_vector = vector[::step]
-    return downsampled_vector
+    # Calculate the step size for downsampling
+    step = len(vector) / target_length
+    # Use a list comprehension to downsample the list
+    downsampled_list = [vector[int(i * step)] for i in range(target_length)]
+    return downsampled_list
 
 def oversample_vector(vector, target_length):
     if len(vector) >= target_length:
-        return vector
-    # Calculate the number of times to replicate the data
-    num_replications = target_length // len(vector)
-    # Calculate the remaining data needed to reach the target length
-    remaining_length = target_length - (len(vector) * num_replications)
-    # Replicate the data and add the remaining data if needed
-    oversampled_vector = np.tile(vector, (num_replications, 1))
-    # Add the remaining data, if any
-    if remaining_length > 0:
-        oversampled_vector = np.vstack((oversampled_vector, vector[:remaining_length]))
-    return oversampled_vector
+        return vector    
+    # Calculate the step size for interpolation
+    step = len(vector) / (target_length - 1)
+    # Use NumPy to interpolate the values
+    oversampled_list = np.interp(np.arange(0, len(vector) - 1, step), np.arange(len(vector)), vector)
+    # Add the last value from the original list to maintain its value
+    oversampled_list = np.append(oversampled_list, vector[-1])
+    return oversampled_list
 
 
 def predicted_player(distances_list,players):
@@ -91,7 +89,7 @@ def main():
     wasserstein_distances = []
     fastdtw_distances = []
     
-    # Load your tracking data 
+    # Load tracking data 
     df_tr = pd.read_csv(os.path.join(args.data_path,'tracking_dataframe_'+args.label+'.csv'))  # Replace with your data
     # Scale values between -1 and 1
     x_coordinates_tr = scaling(list(df_tr['x']))
@@ -99,14 +97,14 @@ def main():
     plot(x_coordinates_tr,y_coordinates_tr,args.label,"tracking")
     curve_tr = curve(x_coordinates_tr,y_coordinates_tr)
     
-    # Load your tracking data 
+    # Load boudning box data 
     for player in args.players:
         print(" check distance for player "+player)
-        df_bb = pd.read_csv(os.path.join(args.data_path,'bounding_boxes_dataframe_'+player+'.csv'))
+        df_bb = pd.read_csv(os.path.join(args.data_path,'bounding_boxes_dataframe_'+args.view+'_'+player+'.csv'))
         x_coordinates_bb = []
         y_coordinates_bb = []
         for i in range(1,args.number_frames):
-            x,y = center_coordinate(df_bb[df_bb["video_frame"]==args.prefix+str(i)])
+            x,y = center_coordinate(df_bb[df_bb["video_frame"]==args.frame_video_name+'_'+args.view+'_'+str(i)])
             if x==0 and y==0:
                 if len(x_coordinates_bb) == 0:
                     x_coordinates_bb.append(x)
