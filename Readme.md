@@ -27,7 +27,8 @@ Code details:
 2. Visualize Helmet detections:
    [extract_frames.py](./extract_frames.py) extracts frames from a given video.
    [draw_bounding_boxes.py](./draw_bounding_boxes.py) draws rectangles around identified Helmets.
-   ![Local Image](data/bb_image.jpg)
+   ![Local Image](data/bb_image_endzone.jpg)
+   ![Local Image](data/bb_image_sideline.jpg)
 
 3. Visualize tracking data:
    [plot_tracking_data.py](./plot_tracking_data.py) plots the curve followed by a player.
