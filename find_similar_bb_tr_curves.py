@@ -15,25 +15,28 @@ import matplotlib.pyplot as plt
 import os
 import numpy as np
 import argparse
-from distances import Hausdorff_distance, Wasserstein, Discrete_frechet, Fastdtw_distance
-
+from distances import Hausdorff_distance, Discrete_frechet, Fastdtw_distance
 
 parser = argparse.ArgumentParser(description='Associate bounding box and tracking curves')
 # Benchmark specific args
-parser.add_argument('--data_path', default="./video_frames/train/57583_000082_Endzone", type=str,help='path of extracted dataframes')
+parser.add_argument('--data_path', default="./video_frames/train/57583_000082", type=str,help='path of extracted dataframes')
 parser.add_argument('--number_frames', default=472, type=int,help='maximum number of frames extracted from the video game')
 parser.add_argument('--frame_video_name', default="57583_000082", type=str,help='name of the video from which the frame was extracted')
-parser.add_argument('--view', default="Endzone", type=str,help='precise the side if Endzone or Sideline')
-parser.add_argument('--label', default='H50', type=str,help='the player to identify')
-parser.add_argument('--players', default=['V5','V13','V15','V34','V68','V72','V73','V74','V79','V86','V87',
-                                          'H22','H27','H30','H36','H50','H56','H59','H90','H96','H97','H99'], type=list,help='list of player IDs')
-
+parser.add_argument('--view', default="Sideline", type=str,help='precise the side if Endzone or Sideline')
+parser.add_argument('--label', default='H30', type=str,help='the player to identify')
+parser.add_argument('--scale', default=False, type=bool,help='Scale values between -1 and 1 or not')
 
 def center_coordinate(row):
     if len(row) != 0:
         return row['left'].iloc[0]+row['width'].iloc[0]/2,row['top'].iloc[0]+row['height'].iloc[0]/2
     else:
         return 0,0
+    
+# def center_coordinate(row):
+#     if len(row) != 0:
+#         return row['x'].iloc[0],row['y'].iloc[0]
+#     else:
+#         return 0,0
     
 def plot(x_coordinates,y_coordinates, label,data_type):
     plt.scatter(x_coordinates,y_coordinates, color='blue', marker='o')
@@ -83,22 +86,27 @@ def predicted_player(distances_list,players):
 
 def main():
     args = parser.parse_args()
+    players = pd.read_csv(os.path.join(args.data_path,'players.csv'),index_col=0)
+    players = list(players['player'])
     
     hausdorff_distances = []
     frechet_distances = []
-    wasserstein_distances = []
     fastdtw_distances = []
     
     # Load tracking data 
-    df_tr = pd.read_csv(os.path.join(args.data_path,'tracking_dataframe_'+args.label+'.csv'))  # Replace with your data
+    df_tr = pd.read_csv(os.path.join(args.data_path,'tracking_dataframe_video_'+args.label+'.csv'))  # Replace with your data
     # Scale values between -1 and 1
-    x_coordinates_tr = scaling(list(df_tr['x']))
-    y_coordinates_tr = scaling(list(df_tr['y']))
+    if args.scale:
+        x_coordinates_tr = scaling(list(df_tr['x']))
+        y_coordinates_tr = scaling(list(df_tr['y']))
+    else:
+        x_coordinates_tr = list(df_tr['x'])
+        y_coordinates_tr = list(df_tr['y'])
     plot(x_coordinates_tr,y_coordinates_tr,args.label,"tracking")
     curve_tr = curve(x_coordinates_tr,y_coordinates_tr)
     
-    # Load boudning box data 
-    for player in args.players:
+    # Load bounding box data 
+    for player in players:
         print(" check distance for player "+player)
         df_bb = pd.read_csv(os.path.join(args.data_path,'bounding_boxes_dataframe_'+args.view+'_'+player+'.csv'))
         x_coordinates_bb = []
@@ -117,8 +125,9 @@ def main():
                 y_coordinates_bb.append(y)
     
         # Scale values between -1 and 1
-        x_coordinates_bb = scaling(x_coordinates_bb)
-        y_coordinates_bb = scaling(y_coordinates_bb)
+        if args.scale:
+            x_coordinates_bb = scaling(x_coordinates_bb)
+            y_coordinates_bb = scaling(y_coordinates_bb)
         
         # Adjust the number of points in bb curve to get same number of points in both curves
         if len(x_coordinates_bb)>len(x_coordinates_tr):
@@ -134,15 +143,13 @@ def main():
         # Calculate the distance between curves representing sequential coordinates of bounding boxes and tracking data 
         hausdorff_distances.append(Hausdorff_distance(curve_tr,curve_bb))
         frechet_distances.append(Discrete_frechet(curve_tr, curve_bb))
-        wasserstein_distances.append(Wasserstein(x_coordinates_tr, y_coordinates_tr,x_coordinates_bb, y_coordinates_bb))
         fastdtw_distances.append(Fastdtw_distance(curve_tr, curve_bb))
         
     # Display predicted players based on curves comparison
     print("The ID player: ",args.label)
-    print("Predicted player using hausdorff distance: ",predicted_player(hausdorff_distances,args.players))
-    print("Predicted player using frechet distance: ",predicted_player(frechet_distances,args.players))
-    print("Predicted player using wasserstein distance: ",predicted_player(wasserstein_distances,args.players))
-    print("Predicted player using fastdtw distance: ",predicted_player(fastdtw_distances,args.players))
+    print("Predicted player using hausdorff distance: ",predicted_player(hausdorff_distances,players))
+    print("Predicted player using frechet distance: ",predicted_player(frechet_distances,players))
+    print("Predicted player using fastdtw distance: ",predicted_player(fastdtw_distances,players))
     
 if __name__ =="__main__":
     main()

@@ -11,21 +11,22 @@ import argparse
 
 parser = argparse.ArgumentParser(description='Extract frames')
 # Benchmark specific args
-parser.add_argument('--video_path', default='./nfl-health-and-safety-helmet-assignment/train/57583_000082_Endzone.mp4', 
+parser.add_argument('--video_path', default='./nfl-health-and-safety-helmet-assignment/train/57583_000082_Sideline.mp4', 
                     type=str,help='path of the video')
-parser.add_argument('--frames_save_path', default="./video_frames/train/57583_000082_Endzone", type=str,help='path to folder where to save extracted frames')
+parser.add_argument('--frames_save_path', default="./video_frames/train/57583_000082/frames_Sideline", type=str,help='path to folder where to save extracted frames')
 
 
 def main():
-    args = parser.parse_args()
+    args = parser.parse_args()  
+    
+    if not(os.path.exists(args.frames_save_path)):
+        os.mkdir(args.frames_save_path)
     
     cap = cv2.VideoCapture(args.video_path)
-    
     # Check if the video file was opened successfully
     if not cap.isOpened():
         print("Error: Could not open video file.")
         exit()
-    
     frame_number = 0
     while True:
         # Read a frame from the video
@@ -36,10 +37,8 @@ def main():
         # Save the frame as an image
         frame_filename = f"frame_{frame_number:04d}.jpg"
         cv2.imwrite(os.path.join(args.frames_save_path,frame_filename), frame)
-    
         # Increment frame number
         frame_number += 1
-    
     # Release the video file and close the window if open
     cap.release()
     cv2.destroyAllWindows()

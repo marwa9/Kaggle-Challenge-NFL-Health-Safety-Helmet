@@ -9,14 +9,20 @@ The main tasks are:
 I took into account the provided recommendation to approach the exercise as a problem-solving task.
 My contemplations revolve around these two ideas:
 
-1. Create visual representations of the graphs for helmet positions using bounding box and tracking data at the same time.
-   Map points on both graphs to identify Helmet IDs.
-   Main challenge: how to synchronize bounding box detections and tracking data (different number of frames and tracking points). 
+Idea 1. Identify the helmets corresponding to the bounding box data based on the tracking data.
+	We assume we know each helmet's team.
+	Step 1: Calculate the distance matrix between the helmets using the tracking data and the bounding box data.
+	Second step: Identify the closest players of both teams on the basis of the distance matrices.
+	=> One player is identified per team
+	Third step: Iterative process: For a player on team A, find the player closest to him on the same team. 
+	At each stage, players already identified are removed from the team.
+	Main challenges: Distances between players calculated using tracking data are not proportional to those calculated using bouding box data.
+ 
 
-2. Identify the followed curve of each Helmet bounding box center.
-   Check the closest curve to the Helmet box center among the tracking curves of players for identification.
-   => Use distances that conserve geometrical properties of the curves.
-   Main challenges: Project tracking  and bounding box curves in the same plan.
+Idea 2. Identify the followed curve of each Helmet bounding box center.
+        Check the closest curve to the Helmet box center among the tracking curves of players for identification.
+        => Use distances that conserve geometrical properties of the curves.
+        Main challenges: Project tracking  and bounding box curves in the same plan.
 
 
 Code details: 
@@ -27,9 +33,7 @@ Code details:
 2. Visualize Helmet detections:
    [extract_frames.py](./extract_frames.py) extracts frames from a given video.
    [draw_bounding_boxes.py](./draw_bounding_boxes.py) draws rectangles around identified Helmets.
-   ![Local Image](data/bb_image_endzone.jpg)
    <img src="data/bb_image_endzone.jpg" width="300" height="200">
-   ![Local Image](data/bb_image_sideline.jpg)
    <img src="data/bb_image_sideline.jpg" width="300" height="200">
 
 3. Visualize tracking data:
@@ -37,13 +41,16 @@ Code details:
    ![Local Image](data/tracking_plot_H50.png)
 
 
-4. Visualize tracking data:
+4. Synchronize tracking and bouding box data
+   [extract_tacking_dataframe_video.py](./extract_tacking_dataframe_video.py) generates a new tracking dataframe per player
+   corresponding to a given video.
+
+5. Visualize player graphs:
    [display_bb_tr_graphs.py](./display_bb_tr_graphs.py) plots the graphs of players showing their positions based on tracking 
    and bounding box data corresponding to the same event.
    ![Local Image](data/snap_ball_graph_tr.png)
    ![Local Image](data/snap_ball_graph_bb.png)
 
-5. Idea 1: 
+6. Idea 1: [match_players.py](./match_players.py) 
 
-6. Idea 2:
-   [find_similar_bb_tr_curves.py](./find_similar_bb_tr_curves.py) 
+7. Idea 2: [find_similar_bb_tr_curves.py](./find_similar_bb_tr_curves.py) 
