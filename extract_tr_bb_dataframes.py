@@ -13,11 +13,10 @@ import argparse
 parser = argparse.ArgumentParser(description='')
 # Benchmark specific args
 parser.add_argument('--videos_path', default="./video_frames/train", type=str,help='path of extracted dataframes')
-parser.add_argument('--video_name', default='57583_000082_Sideline', type=str,help='Decide if optmizer is Adam or SGD')
 parser.add_argument('--game_Key', default=57583, type=int,help='maximum number of frames extracted from the video game')
 parser.add_argument('--playID', default=82, type=int,help='frame_name')
 parser.add_argument('--dataframes_path', default="./nfl-health-and-safety-helmet-assignment", type=str,help='path of extracted dataframes')
-parser.add_argument('--save_path', default="./video_frames/train/57583_000082_Endzone", type=str,help='path of extracted dataframes')
+parser.add_argument('--save_path', default="./video_frames/train/57583_000082", type=str,help='path of extracted dataframes')
 
 def main():
     args = parser.parse_args()
@@ -40,6 +39,8 @@ def main():
     for player in players:
         df_player = df_tracking[df_tracking['player']==player]
         df_player.to_csv(os.path.join(args.save_path,'tracking_dataframe_{}.csv'.format(player)))
+    dataframe_players = pd.DataFrame(players,columns = ['player'])
+    dataframe_players.to_csv(os.path.join(args.save_path,'players.csv'))
         
 if __name__ =="__main__":
     main()
