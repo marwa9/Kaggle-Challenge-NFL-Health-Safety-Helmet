@@ -10,12 +10,19 @@ I took into account the provided recommendation to approach the exercise as a pr
 My contemplations revolve around these two ideas:
 
 Idea 1. Identify the helmets corresponding to the bounding box data based on the tracking data.
+
 	We assume we know each helmet's team.
+
 	Step 1: Calculate the distance matrix between the helmets using the tracking data and the bounding box data.
+
 	Second step: Identify the closest players of both teams on the basis of the distance matrices.
+
 	=> One player is identified per team
+
 	Third step: Iterative process: For a player on team A, find the player closest to him on the same team. 
+
 	At each stage, players already identified are removed from the team.
+
 	Main challenges: Distances between players calculated using tracking data are not proportional to those calculated using bouding box data.
  
 
@@ -53,6 +60,10 @@ Code details:
    ![Local Image](data/snap_ball_graph_tr.png)
    ![Local Image](data/snap_ball_graph_bb.png)
 
-6. Idea 1: [match_players.py](./match_players.py) 
+6. Identify the team of each helmet:
+   [identify_helmets_team.py](./identify_helmets_team.py) applies a clustering algorithm to identify the team of each helmet.
 
-7. Idea 2: [find_similar_bb_tr_curves.py](./find_similar_bb_tr_curves.py) 
+
+7. Idea 1: [match_players.py](./match_players.py) 
+
+8. Idea 2: [find_similar_bb_tr_curves.py](./find_similar_bb_tr_curves.py) 

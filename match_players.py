@@ -19,8 +19,6 @@ import numpy as np
 
 parser = argparse.ArgumentParser(description='Draw bounding boxes')
 # Benchmark specific args
-# parser.add_argument('--data_path', default="./video_frames/train/57786_003085", type=str,help='path of extracted frames and dataframes')
-# parser.add_argument('--data_path', default="./video_frames/train/57584_000336", type=str,help='path of extracted frames and dataframes')
 parser.add_argument('--data_path', default="./video_frames/train/57583_000082", type=str,help='path of extracted frames and dataframes')
 parser.add_argument('--view', default="Sideline", type=str,help='precise the side if Endzone or Sideline')
 parser.add_argument('--snap_ball_index', default=0, type=int,help='precise the index of snap ball event')
@@ -87,22 +85,22 @@ def identify_remained_players(prefix,team,players,players_bb_unknown,dist_matrix
         index_players_tr.append(Ptr_index-prefix)
         distances_p_tr = list(dist_matrix_tr[Ptr_index,:][prefix:prefix+len(team)])
         for i in index_players_tr:
-            distances_p_tr[i] = -1
+            distances_p_tr[i] = max(distances_p_tr)+1
         
         Pbb_index = players_bb_unknown.index(Pbb)
         index_players_bb.append(Pbb_index-prefix)
         distances_p_bb = list(dist_matrix_bb[Pbb_index,:][prefix:prefix+len(team)])
         for i in index_players_bb:
-            distances_p_bb[i] = -1
+            distances_p_bb[i] = max(distances_p_bb)+1
             
-        Ptr = players[distances_p_tr.index(max(distances_p_tr))+prefix]
-        Pbb = players_bb_unknown[distances_p_bb.index(max(distances_p_bb))+prefix]
+        Ptr = players[distances_p_tr.index(min(distances_p_tr))+prefix]
+        Pbb = players_bb_unknown[distances_p_bb.index(min (distances_p_bb))+prefix]
         associated_players[players_bb_unknown.index(Pbb)-prefix] = Ptr
         
         counter +=1
         
     return associated_players
-    
+
 def main():
     args = parser.parse_args()
     players = pd.read_csv(os.path.join(args.data_path,'players.csv'),index_col=0)
@@ -117,7 +115,7 @@ def main():
     for p in players:
         bb_data = pd.read_csv(os.path.join(args.data_path,'bounding_boxes_dataframe_{}_{}.csv'.format(args.view,p)))
         x_bb_coordinates.append(bb_data['left'][args.snap_ball_index]+bb_data['width'][args.snap_ball_index]/2)
-        y_bb_coordinates.append(bb_data['top'][args.snap_ball_index]+bb_data['height'][args.snap_ball_index]/2) 
+        y_bb_coordinates.append(bb_data['top'][args.snap_ball_index]+bb_data['height'][args.snap_ball_index]/2)  
     dist_matrix_bb = dist_matrix(points(x_bb_coordinates,y_bb_coordinates))  
     # Replace players by unknown IDs (imitate the real case)
     players_bb_unknown = ['V'+str(i) for i in range(11)] + ['H'+str(i) for i in range(11,22)]
