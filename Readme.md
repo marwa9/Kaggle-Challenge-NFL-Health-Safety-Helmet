@@ -33,6 +33,8 @@ Code details:
 2. Visualize Helmet detections:
    [extract_frames.py](./extract_frames.py) extracts frames from a given video.
    [draw_bounding_boxes.py](./draw_bounding_boxes.py) draws rectangles around identified Helmets.
+
+
    <img src="data/bb_image_endzone.jpg" width="300" height="200">
    <img src="data/bb_image_sideline.jpg" width="300" height="200">
 
