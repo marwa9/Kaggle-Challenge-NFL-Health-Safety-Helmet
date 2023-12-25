@@ -10,19 +10,19 @@ I approached the challenge as a problem-solving task.
 My contemplations revolve around these two ideas:
 
 1. **Identify the helmets corresponding to the bounding box data based on the tracking data**:
-	- We assume we know each helmet's team.
-	-Step 1: Calculate the distance matrix between the helmets using the tracking data and the bounding box data.
-        - Second step: Identify the closest players of both teams on the basis of the distance matrices.
-        - => One player is identified per team
-        - Third step: Iterative process: For a player on team A, find the player closest to him on the same team. 
-        - At each stage, players already identified are removed from the team.
-        - Main challenges: Distances between players calculated using tracking data are not proportional to those calculated using bouding box data.
+   - We assume we know each helmet's team.
+   - Step 1: Calculate the distance matrix between the helmets using the tracking data and the bounding box data.
+   - Second step: Identify the closest players of both teams on the basis of the distance matrices.
+   - => One player is identified per team
+   - Third step: Iterative process: For a player on team A, find the player closest to him on the same team. 
+   - At each stage, players already identified are removed from the team.
+   - Main challenges: Distances between players calculated using tracking data are not proportional to those calculated using bouding box data.
  
 
 2. **Identify the followed curve of each Helmet bounding box center**:
-        - Check the closest curve to the Helmet box center among the tracking curves of players for identification.
-        - => Use distances that conserve geometrical properties of the curves.
-        - Main challenges: Project tracking  and bounding box curves in the same plan.
+   - Check the closest curve to the Helmet box center among the tracking curves of players for identification.
+   - => Use distances that conserve geometrical properties of the curves.
+   - Main challenges: Project tracking  and bounding box curves in the same plan.
 
 
 Code details: 
