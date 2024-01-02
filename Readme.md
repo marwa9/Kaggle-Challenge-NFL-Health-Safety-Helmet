@@ -1,5 +1,5 @@
 This repo contains the code base for the 
-[Kaggle Challenge: NFL-Health-Safety - Helmet-Assignment](https://www.kaggle.com/c/nfl-health-and-safety-helmet-assignment) 
+[Kaggle Challenge: NFL Health & Safety- Helmet Assignment](https://www.kaggle.com/c/nfl-health-and-safety-helmet-assignment) 
 with two main tasks:
 
 1. Visualize helmets detection and plot tracking data
